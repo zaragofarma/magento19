@@ -1,0 +1,37 @@
+<?php
+ini_set('max_execution_time', 0);
+ini_set('memory_limit', '-1');
+set_time_limit(0);
+while (@ob_end_flush());
+require_once ("../app/Mage.php");
+$app = Mage::app();
+Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+if($_REQUEST){
+	$purl=$_REQUEST['url'];
+	$psku=$_REQUEST['sku'];
+}else{
+	$purl=$argv[1];
+	$psku=$argv[2];
+}
+//$p=Mage::getModel('catalog/product')->load(1);
+//echo $p->getSku();die;
+if(!empty($purl) && !empty($psku)){
+   updatePrice($purl,$psku); //call functon to update price with sku and price
+}
+
+function updatePrice($url,$sku){ //function for update price
+	try {
+		$get_product = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+		if ($get_product) {
+		       $get_product->setUrlKey($url)->save(); //update product price here
+			   echo "SKU ".$sku." successful updated";
+		   
+		}else{
+		    echo "product not found";
+		}
+	}catch (Exception $e) {
+	    echo "Cannot retrieve products from Magento: ".$e->getMessage()."<br>";
+	    return;
+	}
+
+}

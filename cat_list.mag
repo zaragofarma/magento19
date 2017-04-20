@@ -1,0 +1,13 @@
+<?php
+require_once ("allfunctions.php");
+$categories = new Allfunctions();
+$showcatlist=$categories->getCategories(1);
+print_r($showcatlist->getData());
+echo "-----------------------";
+$catbyid=$categories->getCategoryById(1,4);
+print_r($catbyid->getData());
+
+echo "active categories-----------------------";
+$catbyid=$categories->getactiveCategories(1);
+print_r($catbyid->getData())
+?>

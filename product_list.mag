@@ -1,0 +1,13 @@
+<?php
+require_once ("allfunctions.php");
+$products = new Allfunctions();
+$showproductlist=$products->getallProducts(1);
+print_r($showproductlist->getData());
+echo "-----------------------";
+$productbyid=$products->getProductById(1,2);
+print_r($productbyid->getData());
+
+echo "active product-----------------------";
+$productbyid=$products->getallactiveProducts(1);
+print_r($productbyid->getData())
+?>

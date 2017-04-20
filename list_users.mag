@@ -1,0 +1,28 @@
+<?php
+require_once ("allfunctions.php");
+$users = new Allfunctions();
+$showlist=$users->getUsers(1);
+//get customer list
+print_r($showlist->getData());
+echo '========================';
+
+//active
+$showlist=$users->activeUsers(1);
+//get customer list
+print_r($showlist->getData());
+echo '========================';
+
+//unactive
+$showlist=$users->unactiveUsers(1);
+//get customer list
+print_r($showlist->getData());
+echo '========================';
+
+//get customer by id
+$getcustomerbyId=$users->getUsersbyId(1,2);
+print_r($getcustomerbyId->getData());
+
+//active get customer by id
+//$getcustomerbyId=$users->activeUsersbyId(1,2);
+//print_r($getcustomerbyId->getData());
+?>

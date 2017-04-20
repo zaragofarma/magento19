@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <title>Documentation Readme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+    #latest-update {
+        padding-bottom: 15px;
+    }
+    
+    #latest-update ol > li {
+        padding: 5px 0;
+    }
+    
+    #latest-update ol ul > li {
+        padding-top: 4px;
+    }
+    
+    #contents .content-box {
+        border: 1px solid black;
+        background-color: #eee;
+        padding: 0 30px 0 15px;
+    }
+    
+    #abstract .directory-structure code {
+        display: block;
+        min-width: 991px;
+        max-height: 600px;
+    }
+    
+    footer {
+        background-color: #555;
+        color: #fff;
+        padding: 15px 0;
+        margin-top: 30px;
+    }
+    
+    @media only screen and (max-width: 1199px) {}
+    
+    @media only screen and (max-width: 991px) {
+        #abstract .directory-structure code {
+            max-height: 360px;
+        }
+    }
+    
+    @media only screen (max-width: 767px) {}
+    </style>
+</head>
+
+<body>
+    <header>
+        <section id="page-title" class="text-center">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h2>Documentaion for Magento functions</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="latest-update">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h3>Latest Updates</h3>
+                        <ol>
+                            <li>
+                                <code>allfunctions.php</code>
+								file use for all functions by use magento class i.e user list, product list. category list etc.
+                            </li>
+                            <li>
+                             <code>list_users.mag</code>
+							 file get all users details which is create our store, means this function provide all users list and allfunctions.php file include in list_users.mag file to call Object.
+                            </li>
+							<li>
+                             <code>cat_list.mag</code>
+							 file get all categories list which is create our store, means this function provide all categories list and allfunctions.php file include in cat_list.mag file to call Object.
+                            </li>
+							<li>
+                             <code>product_list.mag</code>
+							 file get all products list which is create our store, means this function provide all products list and allfunctions.php file include in product_list.mag file to call Object.
+                            </li>
+							<li>
+                             <code>list_newsletter.mag</code>
+							 file get all newsletter list which is create our store, means this function provide all newsletter lists and allfunctions.php file include in list_newsletter.mag file to call Object.
+                            </li>
+							
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </header>
+	<section id="contents">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="content-box">
+                        <h3>Contents</h3>
+                        <ol>
+                            <li><a href="#Userlist">User List Show</a></li>
+							<li><a href="#activeUserlist">User List Show all active Customer</a></li>
+							<li><a href="#unactiveUserlist">User List Show all unactive Customer</a></li>
+							<li><a href="#UserbyId">Get User By Id</a></li>
+                            <li><a href="#Categorylist">Categories List Show</a></li>
+							<li><a href="#CategoryById">Get Category By Id</a></li>
+							<li><a href="#DeleteCategoryById">Delete Category By Id</a></li>
+							
+                            <li><a href="#Productlist">Product List Show</a></li>
+							<li><a href="#ProductById">Get Product By Id</a></li>
+							<li><a href="#DeleteProductById">Delete Product By Id</a></li>
+                            <li><a href="#Newsletterlist">Newsletter List Show</a></li>
+                            <li><a href="#Pages">Order List Show</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	 <section id="Userlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>1. User List Show</h3>
+                    <p>
+                         We need to pass store id in our custom function to get user data.
+					</p>
+                    <h4>For Show user list we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$users = new Allfunctions();
+								$showlist=$users->getUsers(1);
+								print_r($showlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	<section id="activeUserlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>2. User List Show all active Customers</h3>
+                    <p>
+                         We need to pass store id in our custom function to get all active users data.
+					</p>
+                    <h4>For Show user list we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$users = new Allfunctions();
+								$showlist=$users->activeUsers(1);
+								print_r($showlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	<section id="unactiveUserlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>3. User List Show all unactive Customers</h3>
+                    <p>
+                         We need to pass store id in our custom function to get all unactive user data.
+					</p>
+                    <h4>For Show user list we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$users = new Allfunctions();
+								$showlist=$users->unactiveUsers(1);
+								print_r($showlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	<section id="UserbyId">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>4. User By Id</h3>
+                    <p>
+                         We need to pass store id and user id to get user Data.
+					</p>
+                    <h4>For show user details we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$users = new Allfunctions();
+								$getcustomerbyId=$users->getUsersbyId(1,2);//1 store id and 2 user id
+								print_r($getcustomerbyId->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	<section id="Categorylist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>5. Categories List Show</h3>
+                    <p>
+                         We need to pass store id in our custom function to get all Categories data. e.g storeid = 1
+					</p>
+                    <h4>For Show Categories list we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$categories = new Allfunctions();
+								$showcatlist=$categories->getCategories(1);
+								print_r($showcatlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="CategoryById">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>6. Category By Id</h3>
+                    <p>
+                         We need to pass store id and category id to get category Data.
+					</p>
+                    <h4>For show category data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$categories = new Allfunctions();
+								$catbyid=$categories->getCategoryById(1,4);//1 store id and 4 category id
+								print_r($catbyid->getData())
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="DeleteCategoryById">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>7. Delete Category By Id</h3>
+                    <p>
+                         We need to pass category id to delete category.
+					</p>
+                    <h4>For delete category we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$deletecategory = new Allfunctions();
+								$deletecategory->deletCategoryById(4);//4 is category id
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="Productlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>8. Products List Show</h3>
+                    <p>
+                         We need to pass store id in our custom function to get all products data. e.g storeid = 1
+					</p>
+                    <h4>For Show products list we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$products = new Allfunctions();
+								$showproductlist=$products->getallProducts(1);
+								print_r($showproductlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="ProductById">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>9. Product By Id</h3>
+                    <p>
+                         We need to pass store id and Product id to get Product Data.
+					</p>
+                    <h4>For show Product data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$products = new Allfunctions();
+								$productbyid=$products->getProductById(1,2);//1 store id and 2 product id
+								print_r($productbyid->getData())
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="DeleteProductById">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>10. Delete Product By Id</h3>
+                    <p>
+                         We need to pass product id to delete product.
+					</p>
+                    <h4>For delete product we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$deleteproduct = new Allfunctions();
+								$deleteproduct->deletProductById(2);//2 is product id
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="Newsletterlist">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>11. Get all newsletter list by store id</h3>
+                    <p>
+                         We need to pass store id and get all newsletter data.
+					</p>
+                    <h4>For show Newsletter data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$newsletters = new Allfunctions();
+								$showlist=$newsletters->getNewsletterlist(1);//1 store id 
+								print_r($showlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    Documentation for Magento functions use by own class by Mohit Tyagi. This page was last modified on 05 Apr 2017.
+                </div>
+            </div>
+        </div>
+    </footer>
+</body></html>
