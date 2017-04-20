@@ -1,5 +1,4 @@
 <?php
-//test
 ini_set('max_execution_time', 0);
 ini_set('memory_limit', '-1');
 set_time_limit(0);
@@ -12,7 +11,6 @@ class Allfunctions
    public function getUsers($storeId)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
 	$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection->addAttributeToFilter('customer_activated', 0);
 	$collection->addAttributeToFilter('store_id',$storeId);
@@ -22,7 +20,6 @@ class Allfunctions
    public function activeUsers($storeId)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
 	$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection->addAttributeToFilter('customer_activated', 1);
 	$collection->addAttributeToFilter('store_id',$storeId);
@@ -33,7 +30,6 @@ class Allfunctions
    public function unactiveUsers($storeId)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
 	$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection->addAttributeToFilter('customer_activated', 0);
 	$collection->addAttributeToFilter('store_id',$storeId);
@@ -42,35 +38,22 @@ class Allfunctions
    public function getUsersbyId($storeId,$id)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection = Mage::getModel('customer/customer')->load($id);
 	$collection->setStoreId($storeId);
-	//$collection->addFieldToFilter('store_id',$storeId);
-	//$collection->addStoreFilter($storeId);
 	return $collection;
    }
    public function activeUsersbyId($storeId,$id)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection = Mage::getModel('customer/customer')->load($id);
-	//$collection->addAttributeToFilter('firstname', 'ftest');
 	$collection->setStoreId($storeId);
-	//$collection->addFieldToFilter('store_id',$storeId);
-	//$collection->addStoreFilter($storeId);
 	return $collection;
    }
    public function unactiveUsersbyId($storeId,$id)
    {
 	$user=array();
-    //$user = Mage::getModel('customer/customer')->getCollection()->addStoreFilter($storeId)->getData();//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
 	$collection = Mage::getModel('customer/customer')->load($id);
 	$collection->setStoreId($storeId);
-	//$collection->addFieldToFilter('store_id',$storeId);
-	//$collection->addStoreFilter($storeId);
 	return $collection;
    }
    //get all categories
@@ -78,8 +61,6 @@ class Allfunctions
    {
 	$collection=array();
     $collection = Mage::getModel('catalog/category')->getCollection()->setStoreId($storeId);//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    //get all active categories
@@ -87,16 +68,12 @@ class Allfunctions
    {
 	$collection=array();
     $collection = Mage::getModel('catalog/category')->getCollection()->addAttributeToFilter('is_active', 1)->setStoreId($storeId);//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    public function getCategoryById($storeId,$id)
    {
 	$collection=array();
     $collection = Mage::getModel('catalog/category')->load($id)->setStoreId($storeId);//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    
@@ -104,8 +81,6 @@ class Allfunctions
    {
 	$collection=array();
     $collection = Mage::getModel('catalog/product')->getCollection()->setStoreId($storeId);//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    public function getallactiveProducts($storeId)
@@ -113,16 +88,12 @@ class Allfunctions
 	$collection=array();
     $collection = Mage::getModel('catalog/product')->getCollection()->setStoreId($storeId);//->setStoreId($storeId)
 	$collection->addAttributeToFilter('status',1);
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    public function getProductById($storeId,$id)
    {
 	$collection=array();
     $collection = Mage::getModel('catalog/product')->load($id)->setStoreId($storeId);//->setStoreId($storeId)
-	//$collection = Mage::getResourceModel('customer/customer_collection');
-	//$collection->addAttributeToFilter('store_id',1);
 	return $collection;
    }
    public function getNewsletterlist($storeId)
@@ -144,8 +115,4 @@ class Allfunctions
    }
 }
  
-// Create a new instance of our class and run it.
-//$users = new Allfunctions();
-//$showlist=$users->getUsers();
-//print_r($showlist);
 ?>
