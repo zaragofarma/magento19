@@ -1,0 +1,7 @@
+<?php
+require_once ("allfunctions.php");
+$newsletters = new Allfunctions();
+$showlist=$newsletters->getNewsletterlist(1);
+//get customer list
+print_r($showlist->getData());
+?>
