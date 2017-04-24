@@ -1,0 +1,12 @@
+<?php
+require_once ("allfunctions.php");
+$getorder = new Allfunctions();
+$showorderlist=$getorder->getAllorder(1);
+print_r($showorderlist->getData());
+echo '------------------------------------';
+$getorderdetail=$getorder->getorderById(1,1);
+print_r($getorderdetail->getData());
+echo '------------------------------------';
+$getorderdetail=$getorder->getorderByIncrimentId(1,'100000001');
+print_r($getorderdetail->getData());
+?>

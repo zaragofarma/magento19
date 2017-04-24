@@ -113,6 +113,21 @@ class Allfunctions
     $category = Mage::getModel('catalog/category')->load($id);
 	$category->delete();
    }
+   public function getAllorder($storeId)
+   {
+    $salesModel=Mage::getModel("sales/order"); 
+	return $salesCollection = $salesModel->getCollection()->addFieldToFilter('store_id',$storeId); 
+   }
+   public function getorderById($storeId,$id)
+   {
+    $salesModel=Mage::getModel("sales/order"); 
+	return $salesCollection = $salesModel->load($id)->setStoreId($storeId); 
+   }
+   public function getorderByIncrimentId($storeId,$inid)
+   {
+    $salesModel = Mage::getModel('sales/order');
+	return $salesCollection = $salesModel->loadByIncrementId($inid)->setStoreId($storeId); 
+   }
 }
  
 ?>

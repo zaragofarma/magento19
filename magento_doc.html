@@ -86,6 +86,10 @@
                              <code>list_newsletter.mag</code>
 							 file get all newsletter list which is create our store, means this function provide all newsletter lists and allfunctions.php file include in list_newsletter.mag file to call Object.
                             </li>
+							<li>
+                             <code>order_list.mag</code>
+							 file get all order list which is create our store, means this function provide all order lists and allfunctions.php file include in order_list.mag file to call Object.
+                            </li>
 							
                         </ol>
                     </div>
@@ -113,6 +117,9 @@
 							<li><a href="#DeleteProductById">Delete Product By Id</a></li>
                             <li><a href="#Newsletterlist">Newsletter List Show</a></li>
                             <li><a href="#Pages">Order List Show</a></li>
+							<li><a href="#OrderList">Order List Show</a></li>
+							<li><a href="#OrderById">get Order By Id</a></li>
+							<li><a href="#OrderByIncrimentId">get Order By Incriment Id</a></li>
                         </ol>
                     </div>
                 </div>
@@ -369,6 +376,78 @@
 								$newsletters = new Allfunctions();
 								$showlist=$newsletters->getNewsletterlist(1);//1 store id 
 								print_r($showlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="OrderList">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>12. Get all order list by store id</h3>
+                    <p>
+                         We need to pass store id and get all order data.
+					</p>
+                    <h4>For show order data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$getorder = new Allfunctions();
+								$showorderlist=$getorder->getAllorder(1);//1 is store id
+								print_r($showorderlist->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="OrderById">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>13. Get order By Id</h3>
+                    <p>
+                         We need to pass store id and order id to get order details.
+					</p>
+                    <h4>For show order data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$getorder = new Allfunctions();
+								$getorderdetail=$getorder->getorderById(1,1);//1 storeid second is order id
+								print_r($getorderdetail->getData());
+							</code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<section id="OrderByIncrimentId">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>14. Get order By Incriment Id</h3>
+                    <p>
+                         We need to pass store id and Incriment Id get order data.
+					</p>
+                    <h4>For show order data we need to run code in our file</h4>
+                    <div class="directory-structure">
+                        <pre>
+                            <code>
+								require_once ("allfunctions.php");
+								$getorder = new Allfunctions();
+								$orderdetail=$getorder->getorderByIncrimentId(1,'100000001');//1 storeid and sec is incrimentid
+								print_r($orderdetail->getData());
 							</code>
                         </pre>
                     </div>
