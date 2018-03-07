@@ -1,0 +1,30 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Users Magento Class  [V.0.0.1]  (2017-07-04)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//-------------------------------------------------------------------------------------
+// - load   	  	: Load all users from file ( options to update or create new) 
+// - save			: Save all users to magento 
+// - clean    		: Remove all users from magento database
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mge_wishlist extends mgi_wishlist	
+{
+	public		$n 			=	'mge_wishlist::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+
+
+}
+ 

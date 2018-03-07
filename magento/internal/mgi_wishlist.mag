@@ -1,0 +1,80 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Products Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//additemtowishlist($pcode)  add product by code
+//getallitemwishlist() get all wishlist product
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_wishlist extends mg_print	
+{
+	public		$n 			=	'mgi_wishlist::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	//additemtowishlist($pcode)
+	public function additemtowishlist($pCode){
+		if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+		$id = Mage::getModel('catalog/product')->getIdBySku($pCode);
+		$customer = Mage::getSingleton('customer/session')->getCustomer();
+		$customerId=$customer->getId(); 
+		$productId=$id;
+		if($productId)
+		{
+		$wishlist = Mage::getModel('wishlist/wishlist')->loadByCustomer($customerId, true);
+		$product = Mage::getModel('catalog/product')->load($productId);
+		$buyRequest = new Varien_Object(array()); // any possible options that are configurable and you want to save with the product
+		$result = $wishlist->addNewItem($product, $buyRequest);
+		$wishlist->save();
+		$data['responseCode']='1';
+		$data['msg']="Add Product to wishlist Successfully";
+		}
+		else
+		{
+		$data['responseCode']='0';
+		$data['msg']='Please select Customer Or Product';
+		}
+		}
+		else
+		{
+		 $data['responseCode']='0';
+		 $data['msg']='Please Login First';
+		 
+		 }
+		$data2=json_encode($data);
+		echo $data2;
+
+	}
+	//getallitemwishlist()
+	public function getallitemwishlist(){
+        $customer = Mage::getSingleton('customer/session')->getCustomer();
+		if($customer->getId())
+		{
+			 $wishlist = Mage::getModel('wishlist/wishlist')->loadByCustomer($customer, true);
+			 $wishListItemCollection = $wishlist->getItemCollection();
+			 foreach ($wishListItemCollection as $item)
+			 {
+				   echo $item->getName()."</br>";
+				   echo $item->getId()."</br>";
+				   echo $item->getPrice()."</br>";
+				   echo $item->getQty()."</br>";  
+				   $item = Mage::getModel('catalog/product')->setStoreId($item->getStoreId())->load($item->getProductId());
+				   if ($item->getId()) {
+				   } 
+			 } 
+		} 
+			}
+}
+ 

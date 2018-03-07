@@ -1,0 +1,194 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Users Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//addItemtocart($code,$qty) add item to cart with product code & qty
+//getAllItemcart() Show all item in shopping cart
+//deleteallitemscart() Delete all item in shopping cart
+//deletesingleitemcart($pCode) delete single item in cart
+//updatecartitem($pCode,$qty) updated cart item
+//applycouponcode($couponCode) Apply coupon code to cart
+//RemoveCouponcode($couponCode) remove coupon code from cart
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_shoppingcart extends mg_print	
+{
+	public		$n 			=	'mgi_shoppingcart::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	//addItemtocart('code2',2)
+	public function addItemtocart($code,$qty){
+		Mage::init('default');
+        Mage::getSingleton('core/session', array('name' => 'frontend'));  
+
+		$id = Mage::getModel('catalog/product')->getIdBySku($code);
+		if (false !== $id) {
+		// Get customer session
+		$session = Mage::getSingleton('customer/session');
+		// Get cart instance
+		$cart = Mage::getSingleton('checkout/cart'); 
+		$cart->init();
+
+
+		// Add a product with custom options
+		$product = Mage::getModel('catalog/product')->load(Mage::getModel('catalog/product')->getIdBySku($code));
+
+		$param = array(
+			'qty' => $qty
+		);
+
+		$request = new Varien_Object();
+		$request->setData($param);
+		$cart->addProduct($product, $request);  // This line tends to break my code regularly (meaning everything halts when I leave it in)
+
+		// update session
+		$session->setCartWasUpdated(true);
+
+		// save the cart
+		try{
+		$cart->save();
+		}catch(Exception $e){
+		echo $e->getMessage();
+		}
+		}else{
+		echo $code.' product not exists';
+		return 0;
+	    }		
+
+	}
+	//getAllItemcart()
+	public function getAllItemcart(){
+	// This has to run to authenticate customer and checkout session calls.
+	Mage::getSingleton('core/session', array('name' => 'frontend'));
+	// Get any customer model you desire.
+	$oSession = Mage::getSingleton( 'customer/session' );
+	$oCustomer = $oSession->getCustomer();
+	$oCheckout = Mage::getSingleton( 'checkout/session' );
+	$oQuote = $oCheckout->getQuote();
+	$oCart = $oQuote->getAllItems();
+	if( !empty( $oCart ) )
+	{
+		foreach ( $oCart as $oItem ) 
+		{
+			$sName  = $oItem->getProduct()->getName();
+			$fPrice = $oItem->getProduct()->getPrice();
+			var_dump( $sName );
+			var_dump( $fPrice );
+		}
+	}
+
+	}
+	//deleteallitemscart()
+	public function deleteallitemscart(){
+	// This has to run to authenticate customer and checkout session calls.
+	Mage::getSingleton('core/session', array('name' => 'frontend'));
+	// Get any customer model you desire.
+	$oSession = Mage::getSingleton( 'customer/session' );
+	$oCustomer = $oSession->getCustomer();
+	$oCheckout = Mage::getSingleton( 'checkout/session' );
+	$oQuote = $oCheckout->getQuote();
+	$oCart = $oQuote->getAllItems();
+	if( !empty( $oCart ) )
+	{
+		foreach ( $oCart as $oItem ) 
+		{
+			$oItem->delete();
+		}
+	}
+
+	
+	}
+	
+	//deletesingleitemcart
+	public function deletesingleitemcart($pCode){
+	// This has to run to authenticate customer and checkout session calls.
+	Mage::getSingleton('core/session', array('name' => 'frontend'));
+	// Get any customer model you desire.
+	$oSession = Mage::getSingleton( 'customer/session' );
+	$oCustomer = $oSession->getCustomer();
+	$oCheckout = Mage::getSingleton( 'checkout/session' );
+	$oQuote = $oCheckout->getQuote();
+	$oCart = $oQuote->getAllItems();
+	if( !empty( $oCart ) )
+	{
+		foreach ( $oCart as $oItem ) 
+		{   
+		    if($oItem->getProduct()->getSku()==$pCode){
+			$oItem->delete();
+			}
+		}
+	}
+	}
+	
+	//updatecartitem('code2',3)
+	public function updatecartitem($pCode,$qty){
+	// This has to run to authenticate customer and checkout session calls.
+	Mage::getSingleton('core/session', array('name' => 'frontend'));
+	// Get any customer model you desire.
+	$oSession = Mage::getSingleton( 'customer/session' );
+	$oCustomer = $oSession->getCustomer();
+	$oCheckout = Mage::getSingleton( 'checkout/session' );
+	$oQuote = $oCheckout->getQuote();
+	$oCart = $oQuote->getAllItems();
+	if( !empty( $oCart ) )
+	{
+		foreach ( $oCart as $oItem ) 
+		{   
+		    if($oItem->getProduct()->getSku()==$pCode){
+			$oldqty=$oItem->getQty();
+			$qtys=$oldqty+$qty;
+			$oItem->setQty($qtys)->save();
+			}
+		}
+	}
+
+	
+	}
+	
+	//applycouponcode('Test123')
+	public function applycouponcode($couponCode) {
+        $couponCode = $couponCode;
+        if (!Zend_Validate::is(trim($couponCode), 'NotEmpty')) {
+            throw new Exception($this->__('coupon code cannot be empty.'));
+        }
+        $oCoupon = Mage::getModel('salesrule/coupon')->load($couponCode, 'code');
+        $data = $oCoupon->getData();
+        if (empty($data)) {
+            throw new Exception($this->__('coupon code did not match.'));
+        }
+        Mage::getSingleton('checkout/cart')->getQuote()->getShippingAddress()
+                ->setCollectShippingRates(true);
+        Mage::getSingleton('checkout/cart')->getQuote()
+                ->setCouponCode($couponCode)->collectTotals()->save();
+        $quoteData = Mage::getModel('checkout/cart')->getQuote();
+        $subTotal = $quoteData['subtotal'];
+        $subtotal_with_discount = $quoteData['subtotal_with_discount'];
+        $grandTotal = $quoteData['grand_total'];
+        $discountTotal = ($subTotal - $subtotal_with_discount);
+        $discount = number_format($discountTotal, 4, null, '');
+
+        return $discount;
+    }
+	
+	//RemoveCouponcode('Test123')
+	public function RemoveCouponcode(){
+		Mage::getSingleton('checkout/cart')->getQuote()->setCouponCode('')
+                    ->collectTotals()
+                    ->save();
+
+	}
+}
+ 

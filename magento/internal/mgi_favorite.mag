@@ -1,0 +1,76 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Products Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//additemtofavorite($pcode,$qty,$storeid)  add item by code
+//deleteitembyId($itemId) delete item by id
+//updateitembyId($itemId,$qty) update qty by id
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_favorite extends mg_print	
+{
+	public		$n 			=	'mgi_favorite::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	//additemtofavorite($pcode,$storeid,$qty)
+	public function additemtofavorite($pCode,$storeid,$qty){
+		//Mage::init('default');
+        //Mage::getSingleton('core/session', array('name' => 'frontend'));  
+		if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+		$id = Mage::getModel('catalog/product')->getIdBySku($pCode);
+		$customer = Mage::getSingleton('customer/session')->getCustomer();
+		$customerId=$customer->getId(); 
+		$productId=$id;
+		if($productId)
+		{
+		$favorite = Mage::getModel('favorite/favorite');
+		$favorite->setStoreId($storeid);
+		$favorite->setProductId($productId);
+		$favorite->setCustomerId($customerId);
+		$favorite->setQty($qty);
+		$favorite->setStatus(1);
+		$favorite->save();
+		$data['responseCode']='1';
+		$data['msg']="Add Product Successfully";
+		}
+		else
+		{
+		$data['responseCode']='0';
+		$data['msg']='Please select Customer Or Product';
+		}
+		}
+		else
+		{
+		 $data['responseCode']='0';
+		 $data['msg']='Please Login First';
+		 
+		 }
+		$data2=json_encode($data);
+		echo $data2;
+
+	}
+	//deleteitembyId($itemId)
+	public function deleteitembyId($itemId){
+		$favorite = Mage::getModel('favorite/favorite')->load($itemId);
+		$favorite->delete();		
+    }
+	//updateitembyId($itemId)
+	public function updateitembyId($itemId,$qty){
+		$favorite = Mage::getModel('favorite/favorite');		
+		$favorite->setQty($qty)->setId($itemId);		
+	}
+}
+ 

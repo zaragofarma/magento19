@@ -1,0 +1,77 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Products Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//additemtosave($pcode,$qty,$storeid)  add product by code
+//deleteitembyId($itemId) delete item by id
+//updateitembyId($itemId,$qty) update qty by id
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_savelater extends mg_print	
+{
+	public		$n 			=	'mgi_savelater::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	//additemtosave($pcode,$storeid,$qty)
+	public function additemtosave($pCode,$storeid,$qty){
+		//Mage::init('default');
+        //Mage::getSingleton('core/session', array('name' => 'frontend'));  
+		if(Mage::getSingleton('customer/session')->isLoggedIn()) {
+		$id = Mage::getModel('catalog/product')->getIdBySku($pCode);
+		$customer = Mage::getSingleton('customer/session')->getCustomer();
+		$customerId=$customer->getId(); 
+		$productId=$id;
+		if($productId)
+		{
+		$savelater = Mage::getModel('savelater/savelater');
+		$savelater->setStoreId($storeid);
+		$savelater->setProductId($productId);
+		$savelater->setCustomerId($customerId);
+		$savelater->setQty($qty);
+		$savelater->setStatus(1);
+		$savelater->save();
+		$data['responseCode']='1';
+		$data['msg']="Add Product Successfully";
+		}
+		else
+		{
+		$data['responseCode']='0';
+		$data['msg']='Please select Customer Or Product';
+		}
+		}
+		else
+		{
+		 $data['responseCode']='0';
+		 $data['msg']='Please Login First';
+		 
+		 }
+		$data2=json_encode($data);
+		echo $data2;
+
+	}
+	//deleteitembyId($itemId)
+	public function deleteitembyId($itemId){
+		$savelater = Mage::getModel('savelater/savelater')->load($itemId);
+		$savelater->delete();
+		
+    }
+	//updateitembyId($itemId)
+	public function updateitembyId($itemId,$qty){
+		$savelater = Mage::getModel('savelater/savelater');		
+		$savelater->setQty($qty)->setId($itemId);		
+	}
+}
+ 

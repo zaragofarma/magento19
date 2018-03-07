@@ -1,0 +1,114 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Print Magento Class  [V.0.0.3]  (2017-05-26)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//-------------------------------------------------------------------------------------
+// - p			   	  : Agile print in screen taking class and method 
+// - parr		   	  : Print an array of one dimmension - not recursive 
+// - pre		   	  : Print a variable using pre html tag 
+// - prearr		   	  : Print an array using pre html tag 
+// - d_start	   	  : Debugging in file - starting file 
+// - dd			   	  : Debugging in file 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mg_print	
+{
+	public		$n 			=	'mg_print::'			;
+
+	public 		$br			=	'</br>'						;
+//	public 		$br			=	"\n\r"						;
+
+	// Array
+   	public 		$arr										;
+	
+
+	// Strings
+	
+	protected 	$dat_file 	=	''							;
+
+
+	public function p($msg)
+	{
+		// Agile debug method. To load with deb - brqx alias
+	    $puting_contents=$this->n . $this->m . ' - ' . $msg  . $this->br 						;
+		print ($puting_contents)											;
+	}
+
+	public function pre($msg)
+	{
+		print ('<pre>') ; 
+		print_r($msg);
+		print  ('</pre>'); 
+	}
+
+	public function prearr($a_passed)
+	{
+		print ('<pre>') ; 
+		$this->parr($a_passed);
+		print  ('</pre>'); 
+	}
+
+	public function dd($msg)
+	{
+		// Agile debug method. To load with deb - brqx alias
+	    $puting_contents=$this->n . $this->m .  '-' .$msg  . '>' 							;
+        $GLOBALS['putcont'].=$puting_contents;
+		file_put_contents('brqx_debug.ddm',$GLOBALS['putcont'], FILE_APPEND);
+		$GLOBALS['putcont']= ''												;
+	}
+
+	// Debug array
+	public function parr($a_passed)
+	{
+		if ( is_array($a_passed) ) 
+			foreach ($a_passed as $pos => $elem) 	$this->p($pos . ' -> ' . $elem )		;
+	}
+
+	public function d_start($msg , $letter = 'm')
+	{
+		// Debug adding content only
+	    $puting_contents=$this->n . $this->m .  '-' .$msg  . '>' 	;
+        $GLOBALS['putcont']=$puting_contents; // Theme
+
+		file_put_contents('brqx_debug.dd' . $letter ,$GLOBALS['putcont']);
+
+	}
+	
+	public function load_db_data()
+	{
+		// Example of load local.xml - Is better other method
+		if(file_exists(__DIR__ . '/../app/etc/local.xml')) 
+		{
+    
+		    // Load in the local.xml and retrieve the database settings
+		    $xml = simplexml_load_file(__DIR__ . '/../app/etc/local.xml');
+		    
+		    if(isset($xml->global->resources->default_setup->connection)) {
+		        $connection = $xml->global->resources->default_setup->connection;
+		        
+		        // ** MySQL settings - You can get this info from your web host ** //
+		        /** The name of the database for WordPress */
+		        define('DB_NAME', $connection->dbname);
+		 
+		        /** MySQL database username */
+		        define('DB_USER', $connection->username);
+		 
+		        /** MySQL database password */
+		        define('DB_PASSWORD', $connection->password);
+		 
+		        /** MySQL hostname */
+		        define('DB_HOST', $connection->host);
+		        
+		    } // END IF
+
+		}
+	} // END FUNCTION
+}
+ 

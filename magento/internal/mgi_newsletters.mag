@@ -1,0 +1,89 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Newsletters Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+//getNewsletterlist() //get all newsletter list
+//createNewsletter($email,$storeId) // email id to create newsletter with storeId
+//getNewsletterByemail($email) //get newsletter by email
+//unsubscribeByemail($email) //unsubscribe Newsletter by email
+//subscribeByemail($email) //subscribe Newsletter by email
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_newsletters extends mg_print	
+{
+	public		$n 			=	'mgi_newsletters::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	//getNewsletterlist()
+	public function getNewsletterlist(){
+		$newsletter = Mage::getModel('newsletter/subscriber')->getCollection();
+		return $newsletter->getData();
+		/* To Subscribe */
+		//Mage::getModel('newsletter/subscriber')->subscribe('name@domain.com');
+		/* To Unsubscribe */
+		//Mage::getModel('newsletter/subscriber')->loadByEmail('name@domain.com')->unsubscribe();
+	}
+	//getNewsletterByemail('mohitime2007@gmail')
+	public function getNewsletterByemail($email){
+		$newsletter=Mage::getModel('newsletter/subscriber')->loadByEmail($email);
+		//Mage::getModel('newsletter/subscriber')->subscribe($email);
+		return $newsletter->getData();
+	}
+	//unsubscribeByemail('mohitime2007@gmail')
+	public function unsubscribeByemail($email){
+		Mage::getModel('newsletter/subscriber')->loadByEmail($email)->unsubscribe();
+	}
+	//subscribeByemail('mohitime2007@gmail')
+	public function subscribeByemail($email){
+		Mage::getModel('newsletter/subscriber')->subscribe($email);
+	}
+	//createNewsletter('mohitime2007@gmail')
+	public function createNewsletter($email,$storeId=1){
+		//$email = "mohitime2007@gmail.com";
+		// THE "EASY" WAY (but sends a confirmation email to the customer
+		$subscriber = Mage::getModel('newsletter/subscriber')->subscribe($email);
+		// THE "HARD" WAY (Doesn't send confirmation email to customer)
+		// load up the customer we want to subscribe
+		$customer = Mage::getModel('customer/customer')
+		->setWebsiteId(1)
+		->loadByEmail($email);
+		// if we found the customer
+		if ($customer->getId()){
+		// load up the subscriber if possible
+		$subscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($email);
+		if (!$subscriber->getId() 
+		|| $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED 
+		|| $subscriber->getStatus() == Mage_Newsletter_Model_Subscriber::STATUS_NOT_ACTIVE) {
+		$subscriber->setStatus(Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED);
+		$subscriber->setSubscriberEmail($email);
+		$subscriber->setSubscriberConfirmCode($subscriber->RandomSequence());
+		}
+		$subscriber->setStoreId($storeId);
+		$subscriber->setCustomerId($customer->getId());
+		try {
+		$subscriber->save();
+		}
+		catch (Exception $e) {
+		throw new Exception($e->getMessage());
+		}
+		}
+
+
+}
+
+
+}
+ 

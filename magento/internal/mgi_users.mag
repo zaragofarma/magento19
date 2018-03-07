@@ -1,0 +1,126 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Users Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Methods:
+// - get_userlist() : Get all user list
+// - get_userByemail() : get user by Email id
+// - create_user() : Create user by first name, last name, email & password
+// - get_userById() : get user by Id
+// - activeUsers() : get list of all active users by store id
+// - unactiveUsers() : get unactive user list by store id 
+//-------------------------------------------------------------------------------------
+// - build_data   	  : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+
+
+class mgi_users extends mg_print	
+{
+	public		$n 			=	'mgi_users::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	
+	//get_userlist()
+	public function get_userlist($websiteId=1){
+		//$user = Mage::getModel('customer/customer')->setWebsiteId($storeId)->getCollection();
+		$collection = Mage::getResourceModel('customer/customer_collection');
+	    //$collection->addAttributeToFilter('customer_activated', 0);
+	    //$collection->addAttributeToFilter('store_id',0);
+		$collection->addAttributeToFilter('website_id',$websiteId);
+		return $collection;
+	}
+	
+	//get_userByemail('mohitime2007@gmail.com')
+	public function get_userByemail($email,$websiteId=1){
+		$user = Mage::getModel('customer/customer')->setWebsiteId($websiteId)->loadByEmail($email);
+		if(count($user)>0){
+		return $user;
+		}else{
+		echo $email. ' does not exists';
+		return 0;
+		}
+	}
+	
+	//create_user('mohit','tyagi','mohitime11@gmail.com','test123')
+	public function create_user($fname,$lname,$email,$password,$websiteId=1,$storeId=1){
+		$customer = Mage::getModel("customer/customer");
+		$customer   ->setWebsiteId($websiteId)
+					->setStoreId($storeId)
+					->setFirstname($fname)
+					->setLastname($lname)
+					->setEmail($email)
+					->setPassword($password);
+		$customer->save();
+	}
+	
+	//create_user('mohit','tyagi','mohitime11@gmail.com','test123')
+	public function create_user_shippingadd($websiteId=1,$storeId=1){
+				$_custom_address = array (
+				'firstname' => 'Branko',
+				'lastname' => 'Ajzele',
+				'street' => array (
+					'0' => 'Sample address part1',
+					'1' => 'Sample address part2',
+				),
+			 
+				'city' => 'Osijek',
+				'region_id' => '',
+				'region' => '',
+				'postcode' => '31000',
+				'country_id' => 'HR', /* Croatia */
+				'telephone' => '0038531555444',
+			);
+			 
+			$customAddress = Mage::getModel('customer/address');
+			//$customAddress = new Mage_Customer_Model_Address();
+			$customAddress->setData($_custom_address)
+						->setCustomerId(1)
+						->setIsDefaultBilling('1')
+						->setIsDefaultShipping('1')
+						->setSaveInAddressBook('1');
+			 
+			$customAddress->save();
+
+	}
+	
+	//get_userById(3)
+	public function get_userById($customerId){
+		$user = Mage::getModel('customer/customer')->load($customerId);
+		if(count($user)>0 && $user->getId()){
+		return $user;
+		}else{
+		echo $customerId. ' Id does not exists';
+		return 0;
+		}
+	}
+	
+	//activeUsers();
+   public function activeUsers($storeId=1)
+   {
+	$collection = Mage::getResourceModel('customer/customer_collection');
+	$collection->addAttributeToFilter('customer_activated', 1);
+	$collection->addAttributeToFilter('store_id',$storeId);
+	return $collection;
+   }
+   
+   //unactiveUsers();
+   public function unactiveUsers($storeId)
+   {
+	$collection = Mage::getResourceModel('customer/customer_collection');
+	$collection->addAttributeToFilter('customer_activated', 0);
+	$collection->addAttributeToFilter('store_id',$storeId);
+	return $collection;
+   }
+
+
+}
+ 

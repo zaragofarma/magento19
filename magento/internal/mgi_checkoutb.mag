@@ -1,0 +1,708 @@
+<?php
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+// Products Magento Class  [V.0.0.1]  (2017-05-11)
+// Brqx Group - Agile Farmacia Zaragoza Methodology
+// Spc - Cica_d05 - Home - Index_06 - v0_0_1
+//-------------------------------------------------------------------------------------
+// Manage Magento object - Abstraction for Magento version
+//-------------------------------------------------------------------------------------
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+//Methods:
+//createOrder()
+//createorderbypaypal()
+//-------------------------------------------------------------------------------------
+// - build_data : Build html final code for object 
+// ==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--
+class mgi_checkout extends mg_print	
+{
+	public	$n 			=	'mgi_checkout::'			;
+
+
+    public function __construct ()
+   	{   
+
+	}
+	
+	//createOrder()
+	public function createOrder(){
+	$storeId=1;
+	$websiteId = 1;
+
+	$store = Mage::getModel('core/store')->load($storeId); 
+	$firstName = 'John';
+	$lastName = 'Doe';
+	$email = 'johndoe@example.com';
+	$logFileName = 'my-order-log-file.log';
+	 
+	$billingAddress = array(
+				'customer_address_id' => '',
+				'prefix' => '',
+				'firstname' => $firstName,
+				'middlename' => '',
+				'lastname' => $lastName,
+				'suffix' => '',
+				'company' => '', 
+				'street' => array(
+					 '0' => 'Your Customer Address 1', // compulsory
+					 '1' => 'Your Customer Address 2' // optional
+				 ),
+				'city' => 'Culver City',
+				'country_id' => 'US', // two letters country code
+				'region' => 'California', // can be empty '' if no region
+				'region_id' => '12', // can be empty '' if no region_id
+				'postcode' => '90232',
+				'telephone' => '888-888-8888',
+				'fax' => '',
+				'save_in_address_book' => 1
+			);
+			
+	$shippingAddress = array(
+				'customer_address_id' => '',
+				'prefix' => '',
+				'firstname' => $firstName,
+				'middlename' => '',
+				'lastname' => $lastName,
+				'suffix' => '',
+				'company' => '', 
+				'street' => array(
+					 '0' => 'Your Customer Address 1', // compulsory
+					 '1' => 'Your Customer Address 2' // optional
+				 ),
+				'city' => 'Culver City',
+				'country_id' => 'US', // two letters country code
+				'region' => 'California', // can be empty '' if no region
+				'region_id' => '12', // can be empty '' if no region_id
+				'postcode' => '90232',
+				'telephone' => '888-888-8888',
+				'fax' => '',
+				'save_in_address_book' => 1
+			);        
+	 
+	/**
+	 * You need to enable this method from Magento admin
+	 * Other methods: tablerate_tablerate, freeshipping_freeshipping, etc.
+	 */ 
+	$shippingMethod = 'flatrate_flatrate';
+	 
+	/**
+	 * You need to enable this method from Magento admin
+	 * Other methods: checkmo, free, banktransfer, ccsave, purchaseorder, etc.
+	 */ 
+	$paymentMethod = 'checkmo';
+	 
+	/** 
+	 * Array of your product ids and quantity
+	 * array($productId => $qty)
+	 * In the array below, the product ids are 374 and 375 with quantity 3 and 1 respectively
+	 */ 
+	$productIds = array(1 => 3, 2 => 1); 
+	 
+	// Initialize sales quote object
+	$quote = Mage::getModel('sales/quote')
+				->setStoreId($storeId);
+	 
+	// Set currency for the quote
+	$quote->setCurrency(Mage::app()->getStore()->getBaseCurrencyCode());
+	 
+	$customer = Mage::getModel('customer/customer')
+					->setWebsiteId(1)
+					->loadByEmail($email);
+	 
+	/**
+	 * Setting up customer for the quote 
+	 * if the customer is not already registered
+	 */
+	if (!$customer->getId()) {
+		$customer = Mage::getModel('customer/customer');
+		
+		$customer->setWebsiteId(1)
+				 ->setStore($store)
+				 ->setFirstname($firstName)
+				 ->setLastname($lastName)
+				 ->setEmail($email);             
+		
+		/**
+		 * Creating new customer
+		 * This is optional. You may or may not create/save new customer.
+		 * If you don't need to create new customer, you may skip/remove the below try-catch blocks.
+		 */                             
+		try {
+			// you can write your custom password here instead of magento generated password
+			$password = 'test123';//$customer->generatePassword();         
+			$customer->setPassword($password);
+			
+			// set the customer as confirmed
+			$customer->setForceConfirmed(true);
+			
+			// save customer
+			$customer->save();
+			
+			$customer->setConfirmation(null);
+			$customer->save();
+			
+			// set customer address
+			$customerId = $customer->getId();        
+			$customAddress = Mage::getModel('customer/address');            
+			$customAddress->setData($billingAddress)
+						  ->setCustomerId($customerId)
+						  ->setIsDefaultBilling('1')
+						  ->setIsDefaultShipping('1')
+						  ->setSaveInAddressBook('1');
+			
+			// save customer address
+			$customAddress->save();
+			
+			// send new account email to customer    
+			//$customer->sendNewAccountEmail();
+			$storeId = $customer->getSendemailStoreId();
+			$customer->sendNewAccountEmail('registered', '', $storeId);
+			
+			// set password remainder email if the password is auto generated by magento
+			$customer->sendPasswordReminderEmail();
+			
+			// auto login customer
+			//Mage::getSingleton('customer/session')->loginById($customer->getId());
+			
+			Mage::log('Customer with email '.$email.' is successfully created.', null, $logFileName);
+			
+		} catch (Mage_Core_Exception $e) {
+			if (Mage::getSingleton('customer/session')->getUseNotice(true)) {
+				Mage::getSingleton('customer/session')->addNotice(Mage::helper('core')->escapeHtml($e->getMessage()));
+			} else {
+				$messages = array_unique(explode("\n", $e->getMessage()));
+				foreach ($messages as $message) {
+					Mage::getSingleton('customer/session')->addError(Mage::helper('core')->escapeHtml($message));
+				}
+			}
+		} catch (Exception $e) {
+			//Zend_Debug::dump($e->getMessage());
+			Mage::getSingleton('customer/session')->addException($e, $this->__('Cannot add customer'));
+			Mage::logException($e);
+			//$this->_goBack();
+		} 
+	}
+	 
+	// Assign customer to quote
+	$quote->assignCustomer($customer);
+	 
+	// Add products to quote
+	foreach($productIds as $productId => $qty) {
+		$product = Mage::getModel('catalog/product')->load($productId);
+		$quote->addProduct($product, $qty);
+		
+		/**
+		 * Varien_Object can also be passed as the second parameter in addProduct() function like below:
+		 * $quote->addProduct($product, new Varien_Object(array('qty' => $qty)));
+		 */ 
+	}
+	 
+	// Add billing address to quote
+	$billingAddressData = $quote->getBillingAddress()->addData($billingAddress);
+	 
+	// Add shipping address to quote
+	$shippingAddressData = $quote->getShippingAddress()->addData($shippingAddress);
+	 
+	/**
+	 * Billing or Shipping address for already registered customers can be fetched like below
+	 * 
+	 * $customerBillingAddress = $customer->getPrimaryBillingAddress();
+	 * $customerShippingAddress = $customer->getPrimaryShippingAddress();
+	 * 
+	 * Instead of the custom address, you can add these customer address to quote as well
+	 * 
+	 * $billingAddressData = $quote->getBillingAddress()->addData($customerBillingAddress);
+	 * $shippingAddressData = $quote->getShippingAddress()->addData($customerShippingAddress);
+	 */
+	 
+	// Collect shipping rates on quote shipping address data
+	$shippingAddressData->setCollectShippingRates(true)
+						->collectShippingRates();
+	 
+	// Set shipping and payment method on quote shipping address data
+	$shippingAddressData->setShippingMethod($shippingMethod)
+						->setPaymentMethod($paymentMethod);
+	 
+	// Set payment method for the quote
+	$quote->getPayment()->importData(array('method' => $paymentMethod));
+	 
+	try {
+		// Collect totals of the quote
+		$quote->collectTotals();
+	 
+		// Save quote
+		$quote->save();
+		
+		// Create Order From Quote
+		$service = Mage::getModel('sales/service_quote', $quote);
+		$service->submitAll();
+		$incrementId = $service->getOrder()->getRealOrderId();
+		
+		Mage::getSingleton('checkout/session')
+			->setLastQuoteId($quote->getId())
+			->setLastSuccessQuoteId($quote->getId())
+			->clearHelperData();
+		
+		/**
+		 * For more details about saving order
+		 * See saveOrder() function of app/code/core/Mage/Checkout/Onepage.php
+		 */ 
+		
+		// Log order created message
+		Mage::log('Order created with increment id: '.$incrementId, null, $logFileName);
+				
+		$result['success'] = true;
+		$result['error']   = false;
+		
+		//$redirectUrl = Mage::getSingleton('checkout/session')->getRedirectUrl();
+		//$redirectUrl = Mage::getUrl('checkout/onepage/success');
+		//$result['redirect'] = $redirectUrl;
+		
+		// Show response
+		Mage::app()->getResponse()                   
+					 ->setBody(Mage::helper('core')->jsonEncode($result))
+					 //->setRedirect($redirectUrl)
+					 ->sendResponse();
+					   
+		//$this->_redirect('checkout/onepage/success', array('_secure'=>true));
+		//$this->_redirect($redirectUrl);        
+		
+	} catch (Mage_Core_Exception $e) {
+		$result['success'] = false;
+		$result['error'] = true;
+		$result['error_messages'] = $e->getMessage();    
+		Mage::app()->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));
+		
+		if (Mage::getSingleton('checkout/session')->getUseNotice(true)) {
+			Mage::getSingleton('checkout/session')->addNotice(Mage::helper('core')->escapeHtml($e->getMessage()));
+		} else {
+			$messages = array_unique(explode("\n", $e->getMessage()));
+			foreach ($messages as $message) {
+				Mage::getSingleton('checkout/session')->addError(Mage::helper('core')->escapeHtml($message));
+			}
+		}
+	} catch (Exception $e) {
+		$result['success']  = false;
+		$result['error']    = true;
+		$result['error_messages'] = 'There was an error processing your order. Please contact us or try again later.';
+		Mage::app()->getResponse()->setBody(Mage::helper('core')->jsonEncode($result));
+		
+		Mage::logException($e);
+		//$this->_goBack();
+	} 
+
+
+	}
+//file here : app/code/core/Mage/Paypal/Model/Express.php 	
+public function order(Varien_Object $payment, $amount)
+    {
+        $paypalTransactionData = Mage::getSingleton('checkout/session')->getPaypalTransactionData();
+        if (!is_array($paypalTransactionData)) {
+            $this->_placeOrder($payment, $amount);
+        } else {
+            $this->_importToPayment($this->_pro->getApi()->setData($paypalTransactionData), $payment);
+        }
+
+        $payment->setAdditionalInformation($this->_isOrderPaymentActionKey, true);
+
+        if ($payment->getIsFraudDetected()) {
+            return $this;
+        }
+
+        $order = $payment->getOrder();
+        $orderTransactionId = $payment->getTransactionId();
+
+        $api = $this->_callDoAuthorize($amount, $payment, $orderTransactionId);
+
+        $state  = Mage_Sales_Model_Order::STATE_PROCESSING;
+        $status = true;
+
+        $formatedPrice = $order->getBaseCurrency()->formatTxt($amount);
+        if ($payment->getIsTransactionPending()) {
+            $message = Mage::helper('paypal')->__('Ordering amount of %s is pending approval on gateway.', $formatedPrice);
+            $state = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+        } else {
+            $message = Mage::helper('paypal')->__('Ordered amount of %s.', $formatedPrice);
+        }
+
+        $payment->addTransaction(Mage_Sales_Model_Order_Payment_Transaction::TYPE_ORDER, null, false, $message);
+
+        $this->_pro->importPaymentInfo($api, $payment);
+
+        if ($payment->getIsTransactionPending()) {
+            $message = Mage::helper('paypal')->__('Authorizing amount of %s is pending approval on gateway.', $formatedPrice);
+            $state = Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW;
+            if ($payment->getIsFraudDetected()) {
+                $status = Mage_Sales_Model_Order::STATUS_FRAUD;
+            }
+        } else {
+            $message = Mage::helper('paypal')->__('Authorized amount of %s.', $formatedPrice);
+        }
+
+        $payment->resetTransactionAdditionalInfo();
+
+        $payment->setTransactionId($api->getTransactionId());
+        $payment->setParentTransactionId($orderTransactionId);
+
+        $transaction = $payment->addTransaction(Mage_Sales_Model_Order_Payment_Transaction::TYPE_AUTH, null, false,
+            $message
+        );
+
+        $order->setState($state, $status);
+
+        $payment->setSkipOrderProcessing(true);
+        return $this;
+    }
+protected function _placeOrder(Mage_Sales_Model_Order_Payment $payment, $amount)
+    {
+        $order = $payment->getOrder();
+
+        // prepare api call
+        $token = $payment->getAdditionalInformation(Mage_Paypal_Model_Express_Checkout::PAYMENT_INFO_TRANSPORT_TOKEN);
+        $api = $this->_pro->getApi()
+            ->setToken($token)
+            ->setPayerId($payment->
+                getAdditionalInformation(Mage_Paypal_Model_Express_Checkout::PAYMENT_INFO_TRANSPORT_PAYER_ID))
+            ->setAmount($amount)
+            ->setPaymentAction($this->_pro->getConfig()->paymentAction)
+            ->setNotifyUrl(Mage::getUrl('paypal/ipn/'))
+            ->setInvNum($order->getIncrementId())
+            ->setCurrencyCode($order->getBaseCurrencyCode())
+            ->setPaypalCart(Mage::getModel('paypal/cart', array($order)))
+            ->setIsLineItemsEnabled($this->_pro->getConfig()->lineItemsEnabled);
+
+        // call api and get details from it
+        $api->callDoExpressCheckoutPayment();
+
+        $this->_importToPayment($api, $payment);
+        return $this;
+    }
+	
+	public function createorderBycc(){
+    $products = array('2' => array('qty' => 1));
+    //$products;
+    $order = Mage::getModel('sales/order')->load(50);
+    $items = $order->getAllItems();
+    $itemcount=count($items);
+    foreach ($items as $itemId => $item)
+    {
+        //echo $item->getName().'<br/>';
+       // echo $item->getPrice();
+       // echo $item->getSku();
+       $idx=$item->getProductId();
+        $products[$idx]=array('qty'=>$item->getQtyToInvoice());
+       // $products[]= $item->getQtyToInvoice().'<br/>';
+    }
+    //Mage::getSingleton('customer/session')->logout();
+
+    print_r($products);
+
+    //}      
+
+
+
+
+      $customer = Mage::getModel('customer/customer')->load(16);
+      /*$customerId is the id of the customer who is placing the order, it can be passed as an argument to the function place()*/
+
+      $transaction = Mage::getModel('core/resource_transaction');
+      $storeId = $customer->getStoreId();
+      $reservedOrderId = Mage::getSingleton('eav/config')->getEntityType('order')->fetchNewIncrementId($storeId);
+
+      $order = Mage::getModel('sales/order')
+      ->setIncrementId($reservedOrderId)
+      ->setStoreId($storeId)
+      ->setQuoteId(0)
+      ->setGlobal_currency_code('GBP')
+      ->setBase_currency_code('GBP')
+      ->setStore_currency_code('GBP')
+      ->setOrder_currency_code('GBP');
+
+      // set Customer data
+      $order->setCustomer_email($customer->getEmail())
+      ->setCustomerFirstname($customer->getFirstname())
+      ->setCustomerLastname($customer->getLastname())
+      ->setCustomerGroupId($customer->getGroupId())
+      ->setCustomer_is_guest(0)
+      ->setCustomer($customer);
+
+      // set Billing Address
+      $billing = $customer->getDefaultBillingAddress();
+      $billingAddress = Mage::getModel('sales/order_address')
+      ->setStoreId($storeId)
+      ->setAddressType(Mage_Sales_Model_Quote_Address::TYPE_BILLING)
+      ->setCustomerId($customer->getId())
+      ->setCustomerAddressId($customer->getDefaultBilling())
+      ->setCustomer_address_id($billing->getEntityId())
+      ->setPrefix($billing->getPrefix())
+      ->setFirstname($billing->getFirstname())
+      ->setMiddlename($billing->getMiddlename())
+      ->setLastname($billing->getLastname())
+      ->setSuffix($billing->getSuffix())
+      ->setCompany($billing->getCompany())
+      ->setStreet($billing->getStreet())
+      ->setCity($billing->getCity())
+      ->setCountry_id($billing->getCountryId())
+      ->setRegion($billing->getRegion())
+      ->setRegion_id($billing->getRegionId())
+      ->setPostcode($billing->getPostcode())
+      ->setTelephone($billing->getTelephone())
+      ->setFax($billing->getFax());
+      $order->setBillingAddress($billingAddress);
+
+      $shipping = $customer->getDefaultShippingAddress();
+      $shippingAddress = Mage::getModel('sales/order_address')
+      ->setStoreId($storeId)
+      ->setAddressType(Mage_Sales_Model_Quote_Address::TYPE_SHIPPING)
+      ->setCustomerId($customer->getId())
+      ->setCustomerAddressId($customer->getDefaultShipping())
+      ->setCustomer_address_id($shipping->getEntityId())
+      ->setPrefix($shipping->getPrefix())
+      ->setFirstname($shipping->getFirstname())
+      ->setMiddlename($shipping->getMiddlename())
+      ->setLastname($shipping->getLastname())
+      ->setSuffix($shipping->getSuffix())
+      ->setCompany($shipping->getCompany())
+      ->setStreet($shipping->getStreet())
+      ->setCity($shipping->getCity())
+      ->setCountry_id($shipping->getCountryId())
+      ->setRegion($shipping->getRegion())
+      ->setRegion_id($shipping->getRegionId())
+      ->setPostcode($shipping->getPostcode())
+      ->setTelephone($shipping->getTelephone())
+      ->setFax($shipping->getFax());
+
+      $order->setShippingAddress($shippingAddress)
+      ->setShipping_method('flatrate_flatrate')
+      ->setShippingDescription('flatrate');
+
+      $orderPayment = Mage::getModel('sales/order_payment')
+      ->setStoreId($storeId)
+      ->setCustomerPaymentId(0)
+      ->setMethod('ccsave')
+      ->setCcNumber('4111111111111111')
+      ->setCcOwner('ooooo')
+      ->setCcType('VI')
+      ->setCcExpMonth('9')
+      ->setCcExpYear('2018')
+      ->setCcLast4(substr('4111111111111111',-4));
+
+
+      /*
+      ->setPo_number(' - ');
+
+
+      ->setCustomerPaymentId(3)
+      ->setMethod('ccsave')
+      ->setCcNumber('6011111111111117')
+      ->setCcOwner('ooooo')
+      ->setCcType('Discover')
+      ->setCcExpMonth('9');
+      ->setCcExpYear('2014');
+      ->setCcLast4(substr('6011111111111117',-4));
+      */
+      $order->setPayment($orderPayment);
+    //,'36'=>array('qty' => 1)
+      // let say, we have 2 products
+      $subTotal = 0;
+     // $products = array('35' => array('qty' => 1));
+      foreach ($products as $productId=>$product) {
+      echo $product['qty'];
+      $_product = Mage::getModel('catalog/product')->load($productId);
+      $rowTotal = $_product->getPrice() * $product['qty'];
+      $orderItem = Mage::getModel('sales/order_item')
+      ->setStoreId($storeId)
+      ->setQuoteItemId(0)
+      ->setQuoteParentItemId(NULL)
+      ->setProductId($productId)
+      ->setProductType($_product->getTypeId())
+      ->setQtyBackordered(NULL)
+      ->setTotalQtyOrdered($product['rqty'])
+      ->setQtyOrdered($product['qty'])
+      ->setName($_product->getName())
+      ->setSku($_product->getSku())
+      ->setPrice($_product->getPrice())
+      ->setBasePrice($_product->getPrice())
+      ->setOriginalPrice($_product->getPrice())
+      ->setRowTotal($rowTotal)
+      ->setBaseRowTotal($rowTotal);
+
+       $subTotal += $rowTotal;
+      $order->addItem($orderItem);
+      }
+    echo $subTotal;
+      $order->setSubtotal($subTotal)
+      ->setBaseSubtotal($subTotal)
+      ->setGrandTotal($subTotal)
+      ->setBaseGrandTotal($subTotal);
+
+      $transaction->addObject($order);
+      $transaction->addCommitCallback(array($order, 'place'));
+      $transaction->addCommitCallback(array($order, 'save'));
+      $transaction->save(); 
+
+      $order->sendNewOrderEmail();
+	}
+	public function testoreder(){
+	// get logged in cusomer id
+$customerAccountNo = 9;//Mage::getModel('customer/session')->getCustomer()->getId();
+// load customer object
+$customerObj = Mage::getModel('customer/customer')->load($customerAccountNo);
+// assign this customer to quote object, before any type of magento order, first create quote.
+$quoteObj = Mage::getModel('sales/quote')->assignCustomer($customerObj);
+$quoteObj = $quoteObj->setStoreId(1);
+ 
+// product id
+$productId = 2;
+$productModel = Mage::getModel('catalog/product');
+$productObj = $productModel->load($productId);
+ 
+// for simple product
+if ($productObj->getTypeId() == 'simple') {
+    $quoteObj->addProduct($productObj , 1);
+    // for downloadable product
+} else if ($productObj->getTypeId() == 'downloadable') {
+    $params = array();
+    $links = Mage::getModel('downloadable/product_type')->getLinks( $productObj );
+    $linkId = 0;
+    foreach ($links as $link) {
+        $linkId = $link->getId();
+    }
+    $params['product'] = $productId;
+    $params['qty'] = 2;
+    $params['links'] = array($linkId);
+    $request = new Varien_Object();
+    $request->setData($params);
+    $quoteObj->addProduct($productObj , $request);
+}
+// sample billing address
+$billingAddress = array
+(
+    'email' => NULL,
+    'firstname' => "FirstName",
+    'lastname' => "LastName",
+    'telephone' => "102920",
+    'street' => "517 4th Avenue",
+    'country_id' => "US",
+    'city' => 'San Diego',
+    'postcode' => "90001",
+    'region_id' => "12",
+    'region' => 'California',
+    'company' => "Company",
+    'fax' => "123445",
+    'customer_address_id' => NULL,
+);
+ 
+$quoteBillingAddress = Mage::getModel('sales/quote_address');
+$quoteBillingAddress->setData($billingAddress);
+$quoteObj->setBillingAddress($quoteBillingAddress);
+ 
+//if product is not virtual
+if (!$quoteObj->getIsVirtual()) {
+    $shippingAddress = $billingAddress;
+    $quoteShippingAddress = Mage::getModel('sales/quote_address');
+    $quoteShippingAddress->setData($shippingAddress);
+    $quoteObj->setShippingAddress($quoteShippingAddress);
+    // fixed shipping method
+    $quoteObj->getShippingAddress()->setShippingMethod('flatrate_flatrate');
+    $quoteObj->getShippingAddress()->setCollectShippingRates(true);
+    $quoteObj->getShippingAddress()->collectShippingRates();
+}
+ 
+$quoteObj->collectTotals();
+$quoteObj->save();
+ 
+ 
+$transaction = Mage::getModel('core/resource_transaction');
+if ($quoteObj->getCustomerId()) {
+    $transaction->addObject($quoteObj->getCustomer());
+}
+$transaction->addObject($quoteObj);
+$quoteObj->reserveOrderId();
+ 
+$ccInfo = array();
+// assign payment method
+$payment_method = 'ccsave';
+if ($payment_method == "ccsave") {
+    $quotePaymentObj = $quoteObj->getPayment();
+    $quotePaymentObj->setMethod('ccsave');
+    $quoteObj->setPayment($quotePaymentObj);
+    $cc_number = '4111111111111111';
+    $quoteObj->getPayment()->setCcNumber($cc_number);
+    $quoteObj->getPayment()->setCcType('VI');
+    $quoteObj->getPayment()->setCcExpMonth("12");
+    $quoteObj->getPayment()->setCcExpYear("2018");
+    $quoteObj->getPayment()->setCcLast4(substr($cc_number,-4));
+    $quoteObj->getPayment()->setCcCid('123'); 
+} else {
+    $quotePaymentObj = $quoteObj->getPayment();
+    $quotePaymentObj->setMethod($order->getPayment()->getMethod());
+    $quoteObj->setPayment($quotePaymentObj);
+}
+ 
+$convertQuoteObj = Mage::getSingleton('sales/convert_quote');
+if ($quoteObj->getIsVirtual()) {
+    $orderObj = $convertQuoteObj->addressToOrder($quoteObj->getBillingAddress());
+} else {
+    $orderObj = $convertQuoteObj->addressToOrder($quoteObj->getShippingAddress());
+}
+ 
+$orderPaymentObj = $convertQuoteObj->paymentToOrderPayment($quotePaymentObj);
+ 
+$orderObj->setBillingAddress($convertQuoteObj->addressToOrderAddress($quoteObj->getBillingAddress()));
+$orderObj->setPayment($convertQuoteObj->paymentToOrderPayment($quoteObj->getPayment()));
+if (!$quoteObj->getIsVirtual()) {
+    $orderObj->setShippingAddress($convertQuoteObj->addressToOrderAddress($quoteObj->getShippingAddress()));
+}
+ 
+// set payment options
+if (count($ccInfo) > 0) {
+    $orderObj->setPayment($convertQuoteObj->paymentToOrderPayment($quoteObj->getPayment()));
+    $cc_number = '4111111111111111';
+    $orderObj->getPayment()->setCcNumber($cc_number);
+    $orderObj->getPayment()->setCcType('VI');
+    $orderObj->getPayment()->setCcExpMonth("12");
+    $orderObj->getPayment()->setCcExpYear("2018");
+    $orderObj->getPayment()->setCcLast4(substr($cc_number,-4));
+    $orderObj->getPayment()->setCcCid('123');
+} else {
+    $orderObj->setPayment($convertQuoteObj->paymentToOrderPayment($quoteObj->getPayment()));
+}
+ 
+$items=$quoteObj->getAllItems();
+ 
+foreach ($items as $item) {
+//@var $item Mage_Sales_Model_Quote_Item
+    $orderItem = $convertQuoteObj->itemToOrderItem($item);
+    if ($item->getParentItem()) {
+        $orderItem->setParentItem($orderObj->getItemByQuoteItemId($item->getParentItem()->getId()));
+    }
+    $orderObj->addItem($orderItem);
+}
+ 
+$orderObj->setCanShipPartiallyItem(false);
+ 
+$totalDue = $orderObj->getTotalDue();
+ 
+$transaction->addObject($orderObj);
+$transaction->addCommitCallback(array($orderObj, 'place'));
+$transaction->addCommitCallback(array($orderObj, 'save'));
+ 
+try {
+    $transaction->save();
+} catch (Exception $e){
+    Mage::throwException('Order Cancelled Bad Response from Credit Authorization.');
+}
+ 
+$orderObj->sendNewOrderEmail();
+ 
+Mage::dispatchEvent('checkout_type_onepage_save_order_after', array('order'=>$orderObj, 'quote'=>$quoteObj));
+ 
+$quoteObj->setIsActive(0);
+$quoteObj->save();
+	}
+
+public function createorderbypaypal(){
+}
+		
+}
+ 
